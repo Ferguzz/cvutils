@@ -1,4 +1,4 @@
-import cv, warnings, inspect, re
+import cv, warnings, inspect, re, random
 
 def clone(im):
 	"""Modified clone function which checks whether we have an IplImage 
@@ -10,13 +10,22 @@ def clone(im):
 	except AttributeError:
 		return cv.CloneMat(im)
 		
-def create(im):
+def create(im, onechannel = False):
 	"""Function which creates an empty IplImage or CvMat the same size
-	and type as the input image."""
+	and type as the input image.  A single channel version is produced is onechannel is True"""
 	try:
-		return cv.CreateImage(cv.GetSize(im), im.depth, im.channels)
+		im.depth
+		if onechannel:
+			channels = 1
+		else:
+			channels = im.channels
+		return cv.CreateImage(cv.GetSize(im), im.depth, channels)
 	except AttributeError:
-		return cv.CreateMat(im.height, im.width, im.type)
+		if onechannel:
+			mask = 24
+		else: 
+			mask = 0
+		return cv.CreateMat(im.height, im.width, im.type & ~mask)
 		
 def zoom(im, level, centre = 'middle'):
 	"""Simple zoom function.  Issues warning if zoom level is less than 1.
@@ -64,17 +73,35 @@ def resize(im, size):
 
 def blackandwhite(im):
 	"""Converts RGB input to black and white."""
-	try:
-		dst = cv.CreateImage(cv.GetSize(im), im.depth, 1)
-	except AttributeError:
-		dst = cv.CreateMat(im.height, im.width, im.type & 7)
-		
+	dst = create(im, onechannel = True)		
 	cv.CvtColor(im, dst, cv.CV_BGR2GRAY)
 	return dst
 
 def saltandpepper(im, level):
-	pass
-
+	if not (0 < level <= 0.1):
+		warnings.warn('This is a lot of salt and pepper noise.  I would suggest somewhere up to 0.1.')
+		
+	if im.channels == 3:
+		white = (255,255,255)
+		black = (0,0,0)
+	else:
+		white = 255
+		black = 0
+		
+	random.seed()
+	size = im.width*im.height
+	r = range(size)
+	random.shuffle(r)
+	noise_pixels = r[:min(int(level*size), size)]
+	for pix in noise_pixels:
+		x = (pix/im.width) - 1
+		y = pix%(im.width) - 1
+		if random.random() > 0.5:
+			im[x,y] = white
+		else:
+			im[x,y] = black
+	return im
+		
 def gaussiannoise(im, level):
 	pass
 

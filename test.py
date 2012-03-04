@@ -9,6 +9,8 @@ im = zoom(im, 3)
 mat = blackandwhite(mat)
 mat = zoom(mat, 2, (100,4000))
 
+saltandpepper(im, 0.01)
+
 show(im)
 show(mat, 'mat version')
 
