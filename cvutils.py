@@ -1,26 +1,45 @@
-import cv
+import cv, warnings, inspect, re
 
-def check(im):
-	"""Checks whether we have an IplImage of a cvMat by attempting 
-	to access im.depth.  If im is a cvMat this raises an AttributeError."""
+def clone(im):
+	"""Modified clone function which checks whether we have an IplImage 
+	or a cvMat by attempting to access im.depth.  If im is a cvMat this 
+	raises an AttributeError and cv.CloneMat is called instead of cv.CloneImage"""
 	try:
 		im.depth
-		return 'ipl'
+		return cv.CloneImage(im)
 	except AttributeError:
-		return 'mat'
+		return cv.CloneMat(im)
 
-def zoom(im, level):
-	pass
+def zoom(im, level, centre = 'middle'):
+	if level < 1:
+		warnings.warn('Cannot have zoom level less than 1.')
+		return im	
+	if centre == 'middle':
+		centre = ((im.width-1)/2, (im.height-1)/2)
+	width = int(im.width/(2.0*level))
+	height = int(im.height/(2.0*level))	
+	
+	if centre[0] + width >= im.width:
+		centre = (im.width-1-width, centre[1])
+	elif centre[0] - width < 0:
+		centre = (width, centre[1])		
+	if centre[1] + height >= im.height:
+		centre = (centre[0], im.height-1-height)		
+	elif centre[1] - height < 0:
+		centre = (centre[0], height)
+	
+	rect = (centre[0]-width, centre[1]-height, width*2, height*2)
+	dst = cv.GetSubRect(im, rect)
+	size = clone(im)
+	cv.Resize(dst, size)
+	return size
 
 def rotate(im, angle):
-	"""Rotates image by angle degrees clockwise."""
+	"""Rotates image by 'angle' degrees clockwise."""
 	centre = ((im.width-1)/2.0, (im.height-1)/2.0)
 	rot = cv.CreateMat(2, 3, cv.CV_32FC1)
 	cv.GetRotationMatrix2D(centre, -angle, 1.0, rot)
-	if check(im) == 'mat':
-		dst = cv.CloneMat(im)
-	else:
-		dst = cv.CloneImage(im)
+	dst = clone(im)
 	cv.WarpAffine(im, dst, rot)
 	return dst
 	
@@ -42,14 +61,20 @@ def saltandpepper(im, level):
 def gaussiannoise(im, level):
 	pass
 
-numbered_title = 1
 def show(im, title = 'none'):
 	if title == 'none':
-		global numbered_title
-		title = numbered_title
-		numbered_title += 1
-	cv.NamedWindow(str(title))
-	cv.ShowImage(str(title), im)
+		frame = inspect.currentframe()
+		try:
+			context = inspect.getframeinfo(frame.f_back).code_context
+			caller_lines = ''.join([line.strip() for line in context])
+			m = re.search(r'show\s*\((.+?)\)$', caller_lines)
+			if m:
+				title = m.group(1)
+		finally:
+			del frame
+		
+	cv.NamedWindow(title)
+	cv.ShowImage(title, im)
 
 def wait():
 	print 'Press any key to quit...'
