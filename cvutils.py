@@ -9,8 +9,18 @@ def clone(im):
 		return cv.CloneImage(im)
 	except AttributeError:
 		return cv.CloneMat(im)
-
+		
+def create(im):
+	"""Function which creates an empty IplImage or CvMat the same size
+	and type as the input image."""
+	try:
+		return cv.CreateImage(cv.GetSize(im), im.depth, im.channels)
+	except AttributeError:
+		return cv.CreateMat(im.height, im.width, im.type)
+		
 def zoom(im, level, centre = 'middle'):
+	"""Simple zoom function.  Issues warning if zoom level is less than 1.
+	If centre point is too close to an edge it is moved just far enough inside."""
 	if level < 1:
 		warnings.warn('Cannot have zoom level less than 1.')
 		return im	
@@ -30,7 +40,7 @@ def zoom(im, level, centre = 'middle'):
 	
 	rect = (centre[0]-width, centre[1]-height, width*2, height*2)
 	dst = cv.GetSubRect(im, rect)
-	size = clone(im)
+	size = create(im)
 	cv.Resize(dst, size)
 	return size
 
@@ -39,7 +49,7 @@ def rotate(im, angle):
 	centre = ((im.width-1)/2.0, (im.height-1)/2.0)
 	rot = cv.CreateMat(2, 3, cv.CV_32FC1)
 	cv.GetRotationMatrix2D(centre, -angle, 1.0, rot)
-	dst = clone(im)
+	dst = create(im)
 	cv.WarpAffine(im, dst, rot)
 	return dst
 	
@@ -53,7 +63,14 @@ def resize(im, size):
 	pass
 
 def blackandwhite(im):
-	pass
+	"""Converts RGB input to black and white."""
+	try:
+		dst = cv.CreateImage(cv.GetSize(im), im.depth, 1)
+	except AttributeError:
+		dst = cv.CreateMat(im.height, im.width, im.type & 7)
+		
+	cv.CvtColor(im, dst, cv.CV_BGR2GRAY)
+	return dst
 
 def saltandpepper(im, level):
 	pass

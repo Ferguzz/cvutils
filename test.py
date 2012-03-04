@@ -3,21 +3,18 @@ from cvutils import *
 
 im = cv.LoadImage('kitten.jpg')
 mat = cv.LoadImageM('kitten.jpg')
-t = cv.LoadImageM('kitten.jpg')
 
 im = rotate(im, 20)
-# mat = rotate(mat, -20)
-t = zoom(t, 2, (100,4000))
-# im = zoom(im, 10, (130,30))
+im = zoom(im, 3)
+mat = blackandwhite(mat)
+mat = zoom(mat, 2, (100,4000))
 
-# show(im, title='im')
-# show(mat)
-# show(im, title = 'im2')
-# show(t, 'test')
-show(t)
-show(mat)
+show(im)
+show(mat, 'mat version')
 
 wait()
+
+
 
 
 
