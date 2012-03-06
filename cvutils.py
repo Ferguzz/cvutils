@@ -31,7 +31,7 @@ def zoom(im, level, centre = 'middle'):
 	"""Simple zoom function.  Issues warning if zoom level is less than 1.
 	If centre point is too close to an edge it is moved just far enough inside."""
 	if level < 1:
-		warnings.warn('Cannot have zoom level less than 1.')
+		warnings.warn('Cannot have zoom level less than 1.', stacklevel=2)
 		return im	
 	if centre == 'middle':
 		centre = ((im.width-1)/2, (im.height-1)/2)
@@ -77,9 +77,9 @@ def blackandwhite(im):
 	cv.CvtColor(im, dst, cv.CV_BGR2GRAY)
 	return dst
 
-def saltandpepper(im, level):
-	if not (0 < level <= 0.1):
-		warnings.warn('This is a lot of salt and pepper noise.  I would suggest somewhere up to 0.1.')
+def saltandpepper(im, level, nowarning = False):
+	if not (0 < level <= 0.1) and nowarning == False:
+		warnings.warn("This is a lot of salt and pepper noise.  I would suggest somewhere up to 0.1.  Use 'nowarning = True' to suppress this warning.", stacklevel=2)
 		
 	if im.channels == 3:
 		white = (255,255,255)
