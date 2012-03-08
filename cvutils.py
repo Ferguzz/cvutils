@@ -1,5 +1,24 @@
 import cv, warnings, inspect, re, random
 
+def sample(im, size = (16,16), pos = 'random'):
+	"""
+	Returns a rectangluar sample from an image.
+	Parameters: im (cvArr) - The source image
+				size (tuple) - The width and height of the sample rectange (width, height)
+				pos (tuple) - The coordinates of the top-left corner of the sample (col, row)
+	"""
+	if pos == 'random':
+		random.seed()
+		pos = (random.randint(0, im.width-1-size[0]), random.randint(0, im.height-1-size[1]))
+	else:
+		if pos[0] + size[0] >= im.width:
+			pos = (im.width-1-size[0], pos[1])
+			
+		if pos[1] + size[1] >= im.height:
+			pos = (pos[0], im.height-1-size[1])	
+	
+	return cv.GetSubRect(im, pos + size)
+
 def clone(im):
 	"""Modified clone function which checks whether we have an IplImage 
 	or a cvMat by attempting to access im.depth.  If im is a cvMat this 
