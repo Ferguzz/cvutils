@@ -5,9 +5,11 @@ im = cv.LoadImage('kitten.jpg')
 mat = cv.LoadImageM('kitten.jpg')
 
 im = rotate(im, 20)
-im = zoom(im, 0.1)
+im = zoom(im, 1)
+show(sample(mat, (100,300)))
+
 mat = blackandwhite(mat)
-mat = zoom(mat, 2, (100,4000))
+mat = zoom(mat, 2, (1000,20))
 
 saltandpepper(im, 0.05)
 
