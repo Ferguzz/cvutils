@@ -2,12 +2,14 @@ import cv, warnings, inspect, re, random, functools
 
 def sample(im, size = (16,16), pos = 'random'):
 	"""
-	Returns a rectangluar sample from an image.
+	Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside to get the full sample size.
 	
 	**Parameters:** 
 		* im (cvArr) - The source image.
 		* size (tuple) - The width and height of the sample rectange (width, height).
-		* pos (tuple) - The coordinates of the top-left corner of the sample (x, y).  If corner is too close to an edge it is moved just far enough inside.
+		* pos (tuple) - The coordinates of the top-left corner of the sample (x, y).
+	**Returns:**
+		The image sample.
 	"""
 	if pos == 'random':
 		random.seed()
@@ -20,9 +22,16 @@ def sample(im, size = (16,16), pos = 'random'):
 	return cv.GetSubRect(im, pos + size)
 
 def clone(im):
-	"""Modified clone function which checks whether we have an IplImage 
-	or a cvMat by attempting to access im.depth.  If im is a cvMat this 
-	raises an AttributeError and cv.CloneMat is called instead of cv.CloneImage"""
+	"""
+	Clones the image.  The function checks whether we have an IplImage 
+	or a cvMat and returns the same type.
+	
+	**Parameters:**
+	 	* im (cvArr) - The source image.
+	
+	**Returns:**
+		The cloned image.
+	"""
 	try:
 		im.depth
 		return cv.CloneImage(im)
@@ -30,8 +39,16 @@ def clone(im):
 		return cv.CloneMat(im)
 		
 def create(im, onechannel = False):
-	"""Function which creates an empty IplImage or CvMat the same size
-	and type as the input image.  A single channel version is produced is onechannel is True"""
+	"""
+	Creates an empty image the same type and size as the input image.  A single channel version is produced is onechannel = True
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* onechannel (bool) - Create a single channel image.
+	
+	**Returns:**
+		An empty image.
+	"""
 	try:
 		im.depth
 		if onechannel:
@@ -48,10 +65,15 @@ def create(im, onechannel = False):
 		
 def zoom(im, level, centre = 'middle'):
 	"""
-	Returns a zoomed version of the image.
-	Parameters: im (cvArr) - The source image.
-				level (float) - Zoom level (warning is raised if this is below one and no zoom occurs).
-				centre (tuple) - Zoom centre (x, y).  If centre point is too close to an edge it is moved just far enough inside.
+	Returns a zoomed version of the image.  If centre point is too close to an edge it is moved just far enough inside to get the required zoom level.  A warning is raised if level is below 1 and no zoom occurs.  
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* level (float) - Zoom level.
+		* centre (tuple) - Zoom centre (x, y).
+	
+	**Returns:**
+		The zoomed image.
 	"""
 	if level < 1:
 		warnings.warn('Cannot have zoom level less than 1.', stacklevel=2)
@@ -79,7 +101,17 @@ def zoom(im, level, centre = 'middle'):
 	return size
 
 def rotate(im, angle):
-	"""Rotates image by 'angle' degrees clockwise."""
+	"""
+	Rotates image by angle degrees clockwise.
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* angle (float) - Angle in degrees.
+	
+	**Returns:**
+		The rotated image.
+	"""
+	# TODO: arguments to specifcy background colour and clockwise/anti-clockwise.
 	centre = ((im.width-1)/2.0, (im.height-1)/2.0)
 	rot = cv.CreateMat(2, 3, cv.CV_32FC1)
 	cv.GetRotationMatrix2D(centre, -angle, 1.0, rot)
@@ -87,14 +119,33 @@ def rotate(im, angle):
 	cv.WarpAffine(im, dst, rot)
 	return dst
 	
+# Should these functions be merged?
 def contrast(im, value):
-	"""Need to write docstring"""
+	"""
+	Changes the contrast of the image.
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* value (float) - The contrast level.
+	
+	**Returns:**
+		The image with changed contrast.
+	"""
 	dst = create(im)
 	cv.ConvertScale(im, dst, value)
 	return dst
 
 def brightness(im, value):
-	"""Need to write docstring"""
+	"""
+	Changes the brightness of the image.
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* value (float) - The brightness level.
+		
+	**Returns:**
+		The image with changed brightness.
+	"""	
 	dst = create(im)
 	cv.ConvertScale(im, dst, shift = value)
 	return dst
@@ -108,13 +159,30 @@ def resize(im, size):
 	pass
 
 def blackandwhite(im):
-	"""Converts RGB input to black and white."""
+	"""
+	Converts RGB input to black and white.
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+	
+	**Returns:**
+		The black and white image.
+	"""
 	dst = create(im, onechannel = True)		
 	cv.CvtColor(im, dst, cv.CV_BGR2GRAY)
 	return dst
 
 def saltandpepper(im, level, nowarning = False):
-	"""Need to write docstring"""
+	"""Applies salt and pepper to the image.  If the amount of noise if above 10\% a warning is raised.  This can be turned off by setting nowarning = True.
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* level (float) - The amount of noise between 0 and 1.  e.g. 0.05 = 5\%
+		* nowarning (bool) - Suppress warning message.
+	
+	**Returns:**
+		The noisy image.
+	"""
 	if not (0 < level <= 0.1) and nowarning == False:
 		warnings.warn("This is a lot of salt and pepper noise.  I would suggest somewhere up to 0.1.  Use 'nowarning = True' to suppress this warning.", stacklevel=2)
 		
@@ -148,6 +216,9 @@ def gaussiannoise(im, mean = 0.0, std = 15.0):
 		* im - (cvArr) - The source image.
 		* mean (float) - The mean value of the Gaussian distribution.
 		* std (float) - The standard deviation of the Gaussian distribution.  Larger standard deviation means more noise.
+		
+	**Returns:**
+		The noisy image.
 	"""
 	blue_amplification_value = 1.0
 	noise = functools.partial(random.gauss, mean, std)
@@ -156,7 +227,7 @@ def gaussiannoise(im, mean = 0.0, std = 15.0):
 	for row in range(im.height):
 		for col in range(im.width):
 			pix = im[row, col]
-			# Really want to change this so that I don't have to evulate this if on each loop.
+			# TODO: Really want to change this so that I don't have to evulate this if on each loop.
 			# Tried exec -ing strings but it is super slow.
 			# Maybe some sort of higher-order function would work in the future.
 			if im.channels == 3:
@@ -166,7 +237,13 @@ def gaussiannoise(im, mean = 0.0, std = 15.0):
 	return dst
 
 def show(im, title = 'none'):
-	"""Need to write docstring"""
+	"""
+	Opens a window and displays the image.  If no title is provided the title of the window will default to the first argument.
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* title (string) - The title of the window.
+	"""
 	if title == 'none':
 		frame = inspect.currentframe()
 		try:
@@ -182,6 +259,8 @@ def show(im, title = 'none'):
 	cv.ShowImage(title, im)
 
 def wait():
-	"""Need to write docstring"""
+	"""
+	Causes the program to wait at this point until a key is pressed.
+	"""
 	print 'Press any key to quit...'
 	cv.WaitKey(0)
