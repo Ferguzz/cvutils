@@ -3,9 +3,11 @@ import cv, warnings, inspect, re, random
 def sample(im, size = (16,16), pos = 'random'):
 	"""
 	Returns a rectangluar sample from an image.
-	Parameters: im (cvArr) - The source image.
-				size (tuple) - The width and height of the sample rectange (width, height).
-				pos (tuple) - The coordinates of the top-left corner of the sample (x, y).  If corner is too close to an edge it is moved just far enough inside.
+	
+	**Parameters:** 
+		* im (cvArr) - The source image.
+		* size (tuple) - The width and height of the sample rectange (width, height).
+		* pos (tuple) - The coordinates of the top-left corner of the sample (x, y).  If corner is too close to an edge it is moved just far enough inside.
 	"""
 	if pos == 'random':
 		random.seed()
