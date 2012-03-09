@@ -86,7 +86,14 @@ def rotate(im, angle):
 	return dst
 	
 def contrast(im, value):
-	pass
+	dst = create(im)
+	cv.ConvertScale(im, dst, value)
+	return dst
+
+def brightness(im, value):
+	dst = create(im)
+	cv.ConvertScale(im, dst, shift = value)
+	return dst
 
 def normalise(im):
 	pass
@@ -116,14 +123,15 @@ def saltandpepper(im, level, nowarning = False):
 	r = range(size)
 	random.shuffle(r)
 	noise_pixels = r[:min(int(level*size), size)]
+	dst = clone(im)
 	for pix in noise_pixels:
 		x = (pix/im.width) - 1
 		y = pix%(im.width) - 1
 		if random.random() > 0.5:
-			im[x,y] = white
+			dst[x,y] = white
 		else:
-			im[x,y] = black
-	return im
+			dst[x,y] = black
+	return dst
 		
 def gaussiannoise(im, level):
 	pass
