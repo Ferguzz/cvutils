@@ -6,7 +6,7 @@ mat = cv.LoadImageM('kitten.jpg')
 
 im = rotate(im, 20)
 im = zoom(im, 1)
-show(sample(mat, (100,300)))
+show(sample(mat, (100,300), pos = (100,1000)))
 
 mat = blackandwhite(mat)
 mat = zoom(mat, 2, (1000,20))

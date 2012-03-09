@@ -3,19 +3,18 @@ import cv, warnings, inspect, re, random
 def sample(im, size = (16,16), pos = 'random'):
 	"""
 	Returns a rectangluar sample from an image.
-	Parameters: im (cvArr) - The source image
-				size (tuple) - The width and height of the sample rectange (width, height)
-				pos (tuple) - The coordinates of the top-left corner of the sample (row, col)
+	Parameters: im (cvArr) - The source image.
+				size (tuple) - The width and height of the sample rectange (width, height).
+				pos (tuple) - The coordinates of the top-left corner of the sample (x, y).  If corner is too close to an edge it is moved just far enough inside.
 	"""
 	if pos == 'random':
 		random.seed()
-		pos = (random.randint(0, im.height-1-size[0]), random.randint(0, im.width-1-size[1]))
+		pos = (random.randint(0, im.width-1-size[0]), random.randint(0, im.height-1-size[1]))
 	else:
-		if pos[0] + size[1] >= im.height:
-			pos = (im.height-1-size[1], pos[1])
-		if pos[1] + size[0] >= im.width:
-			pos = (pos[0], im.width-1-size[0])
-	pos = (pos[1], pos[0])
+		if pos[0] + size[0] >= im.width:
+			pos = (im.width-1-size[0], pos[1])
+		if pos[1] + size[1] >= im.height:
+			pos = (pos[0], im.height-1-size[1])
 	return cv.GetSubRect(im, pos + size)
 
 def clone(im):
@@ -48,9 +47,9 @@ def create(im, onechannel = False):
 def zoom(im, level, centre = 'middle'):
 	"""
 	Returns a zoomed version of the image.
-	Parameters: im (cvArr) - The source image
-				level (float) - Zoom level (warning is raised if this is below one and no zoom occurs)
-				centre (tuple) - Zoom centre (row, col).  If centre point is too close to an edge it is moved just far enough inside.
+	Parameters: im (cvArr) - The source image.
+				level (float) - Zoom level (warning is raised if this is below one and no zoom occurs).
+				centre (tuple) - Zoom centre (x, y).  If centre point is too close to an edge it is moved just far enough inside.
 	"""
 	if level < 1:
 		warnings.warn('Cannot have zoom level less than 1.', stacklevel=2)
@@ -60,18 +59,18 @@ def zoom(im, level, centre = 'middle'):
 	height = int(im.height/(2.0*level))	
 	
 	if centre == 'middle':
-		centre = ((im.height-1)/2, (im.width-1)/2)
+		centre = ((im.width-1)/2, (im.height-1)/2)
 		
-	if centre[0] + height >= im.height:
-		centre = (im.height-1-height, centre[1])
-	elif centre[0] - height < 0:
-		centre = (height, centre[1])
-	if centre[1] + width >= im.width:
-		centre = (centre[0], im.width-1-width)		
-	elif centre[1] - width < 0:
-		centre = (centre[0], width)		
+	if centre[0] + width >= im.width:
+		centre = (im.width-1-width, centre[1])
+	elif centre[0] - width < 0:
+		centre = (width, centre[1])
+	if centre[1] + height >= im.height:
+		centre = (centre[0], im.height-1-height)		
+	elif centre[1] - height < 0:
+		centre = (centre[0], height)		
 			
-	rect = (centre[1]-width, centre[0]-height, width*2, height*2)
+	rect = (centre[0]-width, centre[1]-height, width*2, height*2)
 	dst = cv.GetSubRect(im, rect)
 	size = create(im)
 	cv.Resize(dst, size)
