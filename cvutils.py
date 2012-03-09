@@ -1,4 +1,4 @@
-import cv, warnings, inspect, re, random
+import cv, warnings, inspect, re, random, functools
 
 def sample(im, size = (16,16), pos = 'random'):
 	"""
@@ -88,19 +88,23 @@ def rotate(im, angle):
 	return dst
 	
 def contrast(im, value):
+	"""Need to write docstring"""
 	dst = create(im)
 	cv.ConvertScale(im, dst, value)
 	return dst
 
 def brightness(im, value):
+	"""Need to write docstring"""
 	dst = create(im)
 	cv.ConvertScale(im, dst, shift = value)
 	return dst
 
 def normalise(im):
+	"""Need to write docstring"""
 	pass
 
 def resize(im, size):
+	"""Need to write docstring"""
 	pass
 
 def blackandwhite(im):
@@ -110,6 +114,7 @@ def blackandwhite(im):
 	return dst
 
 def saltandpepper(im, level, nowarning = False):
+	"""Need to write docstring"""
 	if not (0 < level <= 0.1) and nowarning == False:
 		warnings.warn("This is a lot of salt and pepper noise.  I would suggest somewhere up to 0.1.  Use 'nowarning = True' to suppress this warning.", stacklevel=2)
 		
@@ -135,10 +140,33 @@ def saltandpepper(im, level, nowarning = False):
 			dst[x,y] = black
 	return dst
 		
-def gaussiannoise(im, level):
-	pass
+def gaussiannoise(im, mean = 0.0, std = 15.0):
+	"""
+	Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.
+	
+	**Parameters:**
+		* im - (cvArr) - The source image.
+		* mean (float) - The mean value of the Gaussian distribution.
+		* std (float) - The standard deviation of the Gaussian distribution.  Larger standard deviation means more noise.
+	"""
+	blue_amplification_value = 1.0
+	noise = functools.partial(random.gauss, mean, std)
+	dst = create(im)
+	random.seed()	
+	for row in range(im.height):
+		for col in range(im.width):
+			pix = im[row, col]
+			# Really want to change this so that I don't have to evulate this if on each loop.
+			# Tried exec -ing strings but it is super slow.
+			# Maybe some sort of higher-order function would work in the future.
+			if im.channels == 3:
+				dst[row, col] = (pix[0]+noise(), pix[1]+noise(), pix[2]+(blue_amplification_value*noise()))
+			else:
+				dst[row, col] = pix+noise()
+	return dst
 
 def show(im, title = 'none'):
+	"""Need to write docstring"""
 	if title == 'none':
 		frame = inspect.currentframe()
 		try:
@@ -154,5 +182,6 @@ def show(im, title = 'none'):
 	cv.ShowImage(title, im)
 
 def wait():
+	"""Need to write docstring"""
 	print 'Press any key to quit...'
 	cv.WaitKey(0)
