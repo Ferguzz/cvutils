@@ -1,4 +1,4 @@
-import cv, warnings, inspect, re, random, functools
+import cv, warnings, inspect, re, random, array
 
 def sample(im, size = (16,16), pos = 'random'):
 	"""
@@ -210,7 +210,7 @@ def saltandpepper(im, level, nowarning = False):
 		
 def gaussiannoise(im, mean = 0.0, std = 15.0):
 	"""
-	Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.
+	Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.  **Note:** This function takes a while to run (>1s).
 	
 	**Parameters:**
 		* im - (cvArr) - The source image.
@@ -220,21 +220,35 @@ def gaussiannoise(im, mean = 0.0, std = 15.0):
 	**Returns:**
 		The noisy image.
 	"""
-	blue_amplification_value = 1.0
-	noise = functools.partial(random.gauss, mean, std)
+	# The first version below takes around 0.4s less time to run on my computer than the version beneath it.
+	# But I still don't like it...
+	# Want to change this to make it quicker still and nicer to read.
+	# Numpy would make this really quick but don't want it be a dependancy.
+	# Also it's tricky to add the blue amplification using this method.
 	dst = create(im)
-	random.seed()	
-	for row in range(im.height):
-		for col in range(im.width):
-			pix = im[row, col]
-			# TODO: Really want to change this so that I don't have to evulate this if on each loop.
-			# Tried exec -ing strings but it is super slow.
-			# Maybe some sort of higher-order function would work in the future.
-			if im.channels == 3:
-				dst[row, col] = (pix[0]+noise(), pix[1]+noise(), pix[2]+(blue_amplification_value*noise()))
-			else:
-				dst[row, col] = pix+noise()
+	if im.channels == 3:
+		data = array.array('d', [random.gauss(mean, std) for i in xrange(im.width*im.height*3)])
+		noise = cv.CreateMatHeader(im.height, im.width, cv.CV_64FC3)
+		cv.SetData(noise, data, cv.CV_AUTOSTEP)
+	else:
+		data = array.array('d', [random.gauss(mean, std) for i in xrange(im.width*im.height)])
+		noise = cv.CreateMatHeader(im.height, im.width, cv.CV_64FC1)
+		cv.SetData(noise, data, cv.CV_AUTOSTEP)
+	cv.Add(im, noise, dst)
 	return dst
+	
+	# # TODO: argument for blue amplification?
+	# blue_amplification_value = 1.0
+	# dst = create(im)
+	# random.seed()	
+	# for row in range(im.height):
+	# 	for col in range(im.width):
+	# 		pix = im[row, col]
+	# 		if im.channels == 3:
+	# 			dst[row, col] = (pix[0]+random.gauss(mean, std), pix[1]+random.gauss(mean, std), pix[2]+(blue_amplification_value*random.gauss(mean, std)))
+	# 		else:
+	# 			dst[row, col] = pix+random.gauss(mean, std)
+	# return dst
 
 def show(im, title = 'none'):
 	"""
@@ -262,5 +276,5 @@ def wait():
 	"""
 	Causes the program to wait at this point until a key is pressed.
 	"""
-	print 'Press any key to quit...'
+	print 'Press any key to continue...'
 	cv.WaitKey(0)

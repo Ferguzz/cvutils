@@ -9,6 +9,7 @@ rot = zoom(rot, 2)
 # show(rot)
 
 # show(sample(mat, (100,300), pos = (100,1000)))
+bw = blackandwhite(mat)
 zoom = zoom(bw, 2, (1000,20))
 # show(zoom)
 
@@ -18,7 +19,8 @@ im = contrast(im, 0.7)
 im = brightness(im, 100)
 show(im, 'optional title')
 
-n = gaussiannoise(blackandwhite(mat), std = 100)
+noise = cv.LoadImage('kitten.jpg')
+n = gaussiannoise(noise, std = 30)
 show(n)
 
 wait()
