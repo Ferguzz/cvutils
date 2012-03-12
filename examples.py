@@ -20,12 +20,13 @@ im = brightness(im, 100)
 show(im, 'optional title')
 
 noise = cv.LoadImage('kitten.jpg')
-n = gaussiannoise(noise, std = 30)
+n = gaussiannoise(blackandwhite(noise), std = 30)
 show(n)
 
+s, pos = sample(mat, return_pos = True)
+print pos
+
 wait()
-
-
 
 
 

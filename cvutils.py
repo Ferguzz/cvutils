@@ -1,6 +1,6 @@
 import cv, warnings, inspect, re, random, array
 
-def sample(im, size = (16,16), pos = 'random'):
+def sample(im, size = (16,16), pos = 'random', show_on_original = False, return_pos = False):
 	"""
 	Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside to get the full sample size.
 	
@@ -8,9 +8,12 @@ def sample(im, size = (16,16), pos = 'random'):
 		* im (cvArr) - The source image.
 		* size (tuple) - The width and height of the sample rectange (width, height).
 		* pos (tuple) - The coordinates of the top-left corner of the sample (x, y).
+		* show_on_original (bool) - Place a white rectangle around the sample on the original image.
+		* return_pos (bool) - Return the randomly generated position coordinate as well.
+		
 	**Returns:**
 		The image sample.
-	"""
+	"""	
 	if pos == 'random':
 		random.seed()
 		pos = (random.randint(0, im.width-1-size[0]), random.randint(0, im.height-1-size[1]))
@@ -19,7 +22,16 @@ def sample(im, size = (16,16), pos = 'random'):
 			pos = (im.width-1-size[0], pos[1])
 		if pos[1] + size[1] >= im.height:
 			pos = (pos[0], im.height-1-size[1])
-	return cv.GetSubRect(im, pos + size)
+	sample = cv.GetSubRect(im, pos + size)
+	if show_on_original == True:
+		if im.channels == 3:
+			colour = (255,255,255)
+		else:
+			colour = 255
+		cv.Rectangle(im, (pos[0]-1, pos[1]-1), (pos[0]+size[0], pos[1]+size[1]), colour, 1)
+	if return_pos == True:
+		return sample, pos
+	return sample
 
 def clone(im):
 	"""
@@ -210,7 +222,7 @@ def saltandpepper(im, level, nowarning = False):
 		
 def gaussiannoise(im, mean = 0.0, std = 15.0):
 	"""
-	Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.  **Note:** This function takes a while to run (>1s).
+	Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.  **Note:** This function takes a while to run on large images.
 	
 	**Parameters:**
 		* im - (cvArr) - The source image.
