@@ -354,23 +354,32 @@ def wait(key = None):
 	print 'Press any key to continue...'
 	cv.WaitKey(0)
 	
-def overlay(im, overlay, pos, blend = 0.5):
+def overlay(im, overlay, pos = (0,0), blend = 1):
 	"""
 	Need to write docstring.
 	"""
 	size = (overlay.width, overlay.height)
 	# Should I move the coordinate inside as with zoom() and sample() or crop the overlay image?  I think cropping might be the best way to go here.
 	warn = False
-	if pos[0] + size[0] >= im.width:
+	if pos[0] + size[0] > im.width:
 		size = (im.width-1-pos[0], size[1])
 		warn = True
-	if pos[1] + size[1] >= im.height:
+	if pos[1] + size[1] > im.height:
 		size = (size[1], im.height-1-pos[1])
 		warn = True
 	if warn:
 		crop(im, size)
-		warnings.warn("The overlay image was too big to fit at the position specifidd.  It has been cropped to %dx%d." %(size[0], size[1]), stacklevel=2)
-		
+		warnings.warn("The overlay image was too big to fit at the position specified.  It has been cropped to %dx%d." %(size[0], size[1]), stacklevel=2)
+
+	cv.SetImageROI(im, pos + size)
+	if blend == 'both':
+		alpha = 1
+		blend = 1
+	else:
+		alpha = 1-blend
+	cv.AddWeighted(im, alpha, overlay, blend, 0, im)
+	cv.ResetImageROI(im)
+	return im
 		
 class webcam:
 	"""
