@@ -1,8 +1,18 @@
-import cv, warnings, inspect, re, random, array
+"""
+Some handy helper functions for writing OpenCV programs in no time!
+
+The idea with this module is that most functions can be used with very few or zero additional arguments.  e.g. if you call :func:`sample()` with just the image as an argument it takes a 16x16 pixel sample from a random point in the image.  However if you want a bit more control you can specify a rectangluar size and a coordinate, as well as tell it to place a white rectangle around the sample on the original image.  Similarly, calling :func:`show()` with just the image creates a :class:`cv.NamedWindow` with the variable name of the image and calles :func:`cv.ShowImage()`.  Again, an optional window title can be passed if required.  I know that is pretty lazy, but it can really speed up your workflow if you are regularly just checking the outputs of CV functions.  
+
+**TODO:**
+	* I could do with using Numpy for a couple of functions but I didn't want to include external dependancies in this module.  However I think Numpy might be an OpenCV prerequisite anyway for Python, so if this is the case then why not!
+	* 
+"""
+
+import cv, warnings, inspect, re, random, array, math
 
 def sample(im, size = (16,16), pos = 'random', show_on_original = False, return_pos = False):
 	"""
-	Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside to get the full sample size.
+	Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside so the full sample size is always returne.
 	
 	**Parameters:** 
 		* im (cvArr) - The source image.
@@ -12,7 +22,7 @@ def sample(im, size = (16,16), pos = 'random', show_on_original = False, return_
 		* return_pos (bool) - Return the randomly generated position coordinate as well.
 		
 	**Returns:**
-		The image sample.
+		The image sample, top-left coordinate of the sample (optional).
 	"""	
 	if pos == 'random':
 		random.seed()
@@ -33,6 +43,35 @@ def sample(im, size = (16,16), pos = 'random', show_on_original = False, return_
 		return sample, pos
 	return sample
 
+
+def crop(im, size, pos = (0,0)):
+	"""
+	This function is very similar to :func:`sample()` in that it returns a specified subsection of the image.  The main difference here is that if the region is too big to fit, the returned image is made smaller.  There is no size default here and pos defaults to the top-left corner of the image.
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* size (tuple) - The cropped image size (w, h).
+		* pos (tuple) - The position of the top-left corner of the cropped image.
+	
+	**Returns:**
+		The cropped image.
+	"""
+	warn = False
+	if pos[0] + size[0] >= im.width:
+		size = (im.width-1-pos[0], size[1])
+		warn = True
+	if pos[1] + size[1] >= im.height:
+		size = (size[0], im.height-1-pos[1])
+		warn = True
+	if warn:
+		warnings.warn("Cropped region went off the edge of the image.  The cropped size has been reduced to %dx%d." %(size[0], size[1]), stacklevel=2)
+
+	rect = (pos[0], pos[1], size[0], size[1])
+	cropped = create(im, size = size)
+	dst = cv.GetSubRect(im, rect)
+	cv.Resize(dst, cropped)
+	return cropped
+
 def clone(im):
 	"""
 	Clones the image.  The function checks whether we have an IplImage 
@@ -50,30 +89,43 @@ def clone(im):
 	except AttributeError:
 		return cv.CloneMat(im)
 		
-def create(im, onechannel = False):
+def create(im, onechannel = False, size = 'same'):
 	"""
-	Creates an empty image the same type and size as the input image.  A single channel version is produced is onechannel = True
+	Creates an empty image the same type and size as the input image.  A single channel version is produced is onechannel = True.  Size can also be specified with size parameter.
 	
 	**Parameters:**
 		* im (cvArr) - The source image.
 		* onechannel (bool) - Create a single channel image.
+		* size (tuple) - Size of the image (w, h).
 	
 	**Returns:**
 		An empty image.
 	"""
 	try:
 		im.depth
+		if size == 'same':
+			width = im.width
+			height = im.height
+		else:
+			width = size[0]
+			height = size[1]
 		if onechannel:
 			channels = 1
 		else:
 			channels = im.channels
-		return cv.CreateImage(cv.GetSize(im), im.depth, channels)
+		return cv.CreateImage((width, height), im.depth, channels)
 	except AttributeError:
+		if size == 'same':
+			width = im.width
+			height = im.height
+		else:
+			width = size[0]
+			height = size[1]
 		if onechannel:
 			mask = 24
 		else: 
 			mask = 0
-		return cv.CreateMat(im.height, im.width, im.type & ~mask)
+		return cv.CreateMat(height, width, im.type & ~mask)
 		
 def zoom(im, level, centre = 'middle'):
 	"""
@@ -124,11 +176,22 @@ def rotate(im, angle):
 		The rotated image.
 	"""
 	# TODO: arguments to specifcy background colour and clockwise/anti-clockwise.
-	centre = ((im.width-1)/2.0, (im.height-1)/2.0)
+	centre = ((im.width-1)/2, (im.height-1)/2)
 	rot = cv.CreateMat(2, 3, cv.CV_32FC1)
 	cv.GetRotationMatrix2D(centre, -angle, 1.0, rot)
 	dst = create(im)
 	cv.WarpAffine(im, dst, rot)
+	
+	# Code in progress to return the new rectangle contained in the rotated image
+	
+	# w = float(im.width)
+	# 	h = float(im.height)
+	# 	angle = (angle/360.0)*2*math.pi
+	# 	width = w/(math.sin(angle)*(h/w + (math.cos(angle)/math.sin(angle))))
+	# 	height = (w/h)*width
+	# pt1 = (centre[0]-int(width/2), centre[1]-int(height/2))
+	# pt2 = (centre[0]+int(width/2)-1, centre[1]+int(height/2)-1)
+	# cv.Rectangle(dst, pt1, pt2, 255)
 	return dst
 	
 # Should these functions be merged?
@@ -284,9 +347,58 @@ def show(im, title = 'none'):
 	cv.NamedWindow(title)
 	cv.ShowImage(title, im)
 
-def wait():
+def wait(key = None):
 	"""
 	Causes the program to wait at this point until a key is pressed.
 	"""
 	print 'Press any key to continue...'
 	cv.WaitKey(0)
+	
+def overlay(im, overlay, pos, blend = 0.5):
+	"""
+	Need to write docstring.
+	"""
+	size = (overlay.width, overlay.height)
+	# Should I move the coordinate inside as with zoom() and sample() or crop the overlay image?  I think cropping might be the best way to go here.
+	warn = False
+	if pos[0] + size[0] >= im.width:
+		size = (im.width-1-pos[0], size[1])
+		warn = True
+	if pos[1] + size[1] >= im.height:
+		size = (size[1], im.height-1-pos[1])
+		warn = True
+	if warn:
+		crop(im, size)
+		warnings.warn("The overlay image was too big to fit at the position specifidd.  It has been cropped to %dx%d." %(size[0], size[1]), stacklevel=2)
+		
+		
+class webcam:
+	"""
+	Need to write docstring.
+	"""
+	def __init__(self, index = 0):
+		"""
+		Initialises an OpenCV capture object.
+		
+		**Parameters:**
+			* index (int) - The device ID of the camera.  If there is just one camera, this should be 0.
+		
+		**Returns:**
+			A webcam instance.
+			
+		**Raises:**
+			* NameError:  The device ID of the camera is invalid.
+		"""
+		self.cap = cv.CaptureFromCAM(index)
+		if not cv.QueryFrame(self.cap): # Not sure why I can't just check self.cap here, it seems to return a capture oject even if initialisation fails.  Weird.
+			raise NameError("Camera initialisation didn't work, maybe the wrong camera index?")
+	def show(self, flip = True):
+		frame = cv.QueryFrame(self.cap)
+		if flip:
+			cv.Flip(frame, flipMode = 1)
+		show(frame, 'webcam')
+	def get(self, flip = True):
+		frame = cv.QueryFrame(self.cap)
+		if flip:
+			cv.Flip(frame, flipMode =1)
+		return frame
