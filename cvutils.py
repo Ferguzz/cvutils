@@ -28,9 +28,10 @@ def sample(im, size = (16,16), pos = 'random', show_on_original = False, return_
 		random.seed()
 		pos = (random.randint(0, im.width-1-size[0]), random.randint(0, im.height-1-size[1]))
 	else:
-		if pos[0] + size[0] >= im.width:
+		# Think I spotted a problem here when the sample is really large, the position can become negative.  This probably applies to crop() too.
+		if pos[0] + size[0] > im.width:
 			pos = (im.width-1-size[0], pos[1])
-		if pos[1] + size[1] >= im.height:
+		if pos[1] + size[1] > im.height:
 			pos = (pos[0], im.height-1-size[1])
 	sample = cv.GetSubRect(im, pos + size)
 	if show_on_original == True:
@@ -57,10 +58,10 @@ def crop(im, size, pos = (0,0)):
 		The cropped image.
 	"""
 	warn = False
-	if pos[0] + size[0] >= im.width:
+	if pos[0] + size[0] > im.width:
 		size = (im.width-1-pos[0], size[1])
 		warn = True
-	if pos[1] + size[1] >= im.height:
+	if pos[1] + size[1] > im.height:
 		size = (size[0], im.height-1-pos[1])
 		warn = True
 	if warn:
@@ -149,11 +150,11 @@ def zoom(im, level, centre = 'middle'):
 	if centre == 'middle':
 		centre = ((im.width-1)/2, (im.height-1)/2)
 		
-	if centre[0] + width >= im.width:
+	if centre[0] + width > im.width:
 		centre = (im.width-1-width, centre[1])
 	elif centre[0] - width < 0:
 		centre = (width, centre[1])
-	if centre[1] + height >= im.height:
+	if centre[1] + height > im.height:
 		centre = (centre[0], im.height-1-height)		
 	elif centre[1] - height < 0:
 		centre = (centre[0], height)		
@@ -368,7 +369,7 @@ def overlay(im, overlay, pos = (0,0), blend = 1):
 		size = (size[1], im.height-1-pos[1])
 		warn = True
 	if warn:
-		crop(im, size)
+		overlay = crop(overlay, size)
 		warnings.warn("The overlay image was too big to fit at the position specified.  It has been cropped to %dx%d." %(size[0], size[1]), stacklevel=2)
 
 	cv.SetImageROI(im, pos + size)

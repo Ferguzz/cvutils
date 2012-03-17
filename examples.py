@@ -6,7 +6,7 @@ mat = cv.LoadImageM('baboon.jpg')
 
 rot = rotate(im, 45)
 # rot = zoom(rot, 2)
-show(rot)
+show(overlay(rot, sample(mat, size=(100,100)), pos = (250,30), blend = 0.5))
 
 # show(sample(mat, (100,300), pos = (100,1000)))
 bw = blackandwhite(mat)
