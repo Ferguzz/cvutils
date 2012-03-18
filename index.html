@@ -50,6 +50,16 @@
 <h1>Welcome to cvutils&#8217;s documentation!<a class="headerlink" href="#welcome-to-cvutils-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-cvutils">
 <span id="a-handy-helper-module-for-writing-opencv-programs-in-no-time"></span><h2>A handy helper module for writing OpenCV programs in no time!<a class="headerlink" href="#module-cvutils" title="Permalink to this headline">¶</a></h2>
+<p>Some handy helper functions for writing OpenCV programs in no time!</p>
+<p>The idea with this module is that most functions can be used with very few or zero additional arguments.  e.g. if you call <a class="reference internal" href="#cvutils.sample" title="cvutils.sample"><tt class="xref py py-func docutils literal"><span class="pre">sample()</span></tt></a> with just the image as an argument it takes a 16x16 pixel sample from a random point in the image.  However if you want a bit more control you can specify a rectangluar size and a coordinate, as well as tell it to place a white rectangle around the sample on the original image.  Similarly, calling <a class="reference internal" href="#cvutils.show" title="cvutils.show"><tt class="xref py py-func docutils literal"><span class="pre">show()</span></tt></a> with just the image creates a <tt class="xref py py-class docutils literal"><span class="pre">cv.NamedWindow</span></tt> with the variable name of the image and calles <tt class="xref py py-func docutils literal"><span class="pre">cv.ShowImage()</span></tt>.  Again, an optional window title can be passed if required.  I know that is pretty lazy, but it can really speed up your workflow if you are regularly just checking the outputs of CV functions.</p>
+<dl class="docutils">
+<dt><strong>TODO:</strong></dt>
+<dd><ul class="first last simple">
+<li>I could do with using Numpy for a couple of functions but I didn&#8217;t want to include external dependancies in this module.  However I think Numpy might be an OpenCV prerequisite anyway for Python, so if this is the case then why not!</li>
+<li></li>
+</ul>
+</dd>
+</dl>
 <dl class="function">
 <dt id="cvutils.blackandwhite">
 <tt class="descclassname">cvutils.</tt><tt class="descname">blackandwhite</tt><big>(</big><em>im</em><big>)</big><a class="reference internal" href="modules/cvutils.html#blackandwhite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.blackandwhite" title="Permalink to this definition">¶</a></dt>
@@ -115,17 +125,35 @@ or a cvMat and returns the same type.</p>
 
 <dl class="function">
 <dt id="cvutils.create">
-<tt class="descclassname">cvutils.</tt><tt class="descname">create</tt><big>(</big><em>im</em>, <em>onechannel=False</em><big>)</big><a class="reference internal" href="modules/cvutils.html#create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an empty image the same type and size as the input image.  A single channel version is produced is onechannel = True</p>
+<tt class="descclassname">cvutils.</tt><tt class="descname">create</tt><big>(</big><em>im</em>, <em>onechannel=False</em>, <em>size='same'</em><big>)</big><a class="reference internal" href="modules/cvutils.html#create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an empty image the same type and size as the input image.  A single channel version is produced is onechannel = True.  Size can also be specified with size parameter.</p>
 <dl class="docutils">
 <dt><strong>Parameters:</strong></dt>
 <dd><ul class="first last simple">
 <li>im (cvArr) - The source image.</li>
 <li>onechannel (bool) - Create a single channel image.</li>
+<li>size (tuple) - Size of the image (w, h).</li>
 </ul>
 </dd>
 <dt><strong>Returns:</strong></dt>
 <dd>An empty image.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="cvutils.crop">
+<tt class="descclassname">cvutils.</tt><tt class="descname">crop</tt><big>(</big><em>im</em>, <em>size</em>, <em>pos=(0</em>, <em>0)</em><big>)</big><a class="headerlink" href="#cvutils.crop" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is very similar to <a class="reference internal" href="#cvutils.sample" title="cvutils.sample"><tt class="xref py py-func docutils literal"><span class="pre">sample()</span></tt></a> in that it returns a specified subsection of the image.  The main difference here is that if the region is too big to fit, the returned image is made smaller.  There is no size default here and pos defaults to the top-left corner of the image.</p>
+<dl class="docutils">
+<dt><strong>Parameters:</strong></dt>
+<dd><ul class="first last simple">
+<li>im (cvArr) - The source image.</li>
+<li>size (tuple) - The cropped image size (w, h).</li>
+<li>pos (tuple) - The position of the top-left corner of the cropped image.</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt>
+<dd>The cropped image.</dd>
 </dl>
 </dd></dl>
 
@@ -150,6 +178,28 @@ or a cvMat and returns the same type.</p>
 <dt id="cvutils.normalise">
 <tt class="descclassname">cvutils.</tt><tt class="descname">normalise</tt><big>(</big><em>im</em><big>)</big><a class="reference internal" href="modules/cvutils.html#normalise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.normalise" title="Permalink to this definition">¶</a></dt>
 <dd><p>Need to write docstring</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cvutils.overlay">
+<tt class="descclassname">cvutils.</tt><tt class="descname">overlay</tt><big>(</big><em>im</em>, <em>overlay</em>, <em>pos=(0</em>, <em>0)</em>, <em>blend=1</em>, <em>nowarning=False</em><big>)</big><a class="headerlink" href="#cvutils.overlay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overlays an image with a specified blend ratio.  If the overlay image is too big to fit at the specified position, it is cropped down to size and a warning is raised.  This can be turned off by setting nowarning = True.</p>
+<dl class="docutils">
+<dt><strong>Parameters:</strong></dt>
+<dd><ul class="first last simple">
+<li>im (cvArr) - The source image,</li>
+<li>overlay (cvArr) - The image to be overlayed.</li>
+<li>pos (tuple) - The position in the image to place the top-left corner of the overlay image.</li>
+<li>blend (float)/(string) - The blend ratio.  If blend is 1, the overlay image is fully opaque, if blend is 0, the overlay image is invisible.  Between 1 and 0 is transparent.  If blend = &#8216;both&#8217;, both images are added as they are, this turns any black in the overlay region to become fully transparent.</li>
+<li>nowarning (bool) - Suppress warning message.</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt>
+<dd><ul class="first last simple">
+<li>The source image with overlay image added.</li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -194,7 +244,7 @@ or a cvMat and returns the same type.</p>
 <dl class="function">
 <dt id="cvutils.sample">
 <tt class="descclassname">cvutils.</tt><tt class="descname">sample</tt><big>(</big><em>im</em>, <em>size=(16</em>, <em>16)</em>, <em>pos='random'</em>, <em>show_on_original=False</em>, <em>return_pos=False</em><big>)</big><a class="reference internal" href="modules/cvutils.html#sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.sample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside to get the full sample size.</p>
+<dd><p>Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside so the full sample size is always returne.</p>
 <dl class="docutils">
 <dt><strong>Parameters:</strong> </dt>
 <dd><ul class="first last simple">
@@ -226,8 +276,14 @@ or a cvMat and returns the same type.</p>
 
 <dl class="function">
 <dt id="cvutils.wait">
-<tt class="descclassname">cvutils.</tt><tt class="descname">wait</tt><big>(</big><big>)</big><a class="reference internal" href="modules/cvutils.html#wait"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.wait" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">cvutils.</tt><tt class="descname">wait</tt><big>(</big><em>key=None</em><big>)</big><a class="reference internal" href="modules/cvutils.html#wait"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.wait" title="Permalink to this definition">¶</a></dt>
 <dd><p>Causes the program to wait at this point until a key is pressed.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="cvutils.webcam">
+<em class="property">class </em><tt class="descclassname">cvutils.</tt><tt class="descname">webcam</tt><big>(</big><em>index=0</em><big>)</big><a class="headerlink" href="#cvutils.webcam" title="Permalink to this definition">¶</a></dt>
+<dd><p>Need to write docstring.</p>
 </dd></dl>
 
 <dl class="function">
