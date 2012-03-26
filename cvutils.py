@@ -2,17 +2,15 @@
 Some handy helper functions for writing OpenCV programs in no time!
 
 The idea with this module is that most functions can be used with very few or zero additional arguments.  e.g. if you call :func:`sample()` with just the image as an argument it takes a 16x16 pixel sample from a random point in the image.  However if you want a bit more control you can specify a rectangluar size and a coordinate, as well as tell it to place a white rectangle around the sample on the original image.  Similarly, calling :func:`show()` with just the image creates a :class:`cv.NamedWindow` with the variable name of the image and calles :func:`cv.ShowImage()`.  Again, an optional window title can be passed if required.  I know that is pretty lazy, but it can really speed up your workflow if you are regularly just checking the outputs of CV functions.  
-
-**TODO:**
-	* I could do with using Numpy for a couple of functions but I didn't want to include external dependancies in this module.  However I think Numpy might be an OpenCV prerequisite anyway for Python, so if this is the case then why not!
-	* 
 """
+
+# Note:  I could do with using Numpy for a couple of functions but I didn't want to include external dependancies in this module.  However I think Numpy might be an OpenCV prerequisite anyway for Python, so if this is the case then why not!
 
 import cv, warnings, inspect, re, random, array, math
 
 def sample(im, size = (16,16), pos = 'random', show_on_original = False, return_pos = False):
 	"""
-	Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside so the full sample size is always returne.
+	Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside so the full sample size is always returned.
 	
 	**Parameters:** 
 		* im (cvArr) - The source image.
@@ -23,6 +21,12 @@ def sample(im, size = (16,16), pos = 'random', show_on_original = False, return_
 		
 	**Returns:**
 		The image sample, top-left coordinate of the sample (optional).
+	
+	.. warning::
+		Think I spotted a problem here that when the sample is really large, the position can become negative.  This maybe applies to :func:`crop()` too.
+	
+	.. seealso::
+		:func:`crop()`
 	"""	
 	if pos == 'random':
 		random.seed()
@@ -56,6 +60,9 @@ def crop(im, size, pos = (0,0)):
 	
 	**Returns:**
 		The cropped image.
+	
+	.. seealso::
+		:func:`sample()`
 	"""
 	warn = False
 	if pos[0] + size[0] > im.width:
@@ -83,6 +90,9 @@ def clone(im):
 	
 	**Returns:**
 		The cloned image.
+	
+	.. seealso::
+		:func:`create()`
 	"""
 	try:
 		im.depth
@@ -92,7 +102,7 @@ def clone(im):
 		
 def create(im, onechannel = False, size = 'same'):
 	"""
-	Creates an empty image the same type and size as the input image.  A single channel version is produced is onechannel = True.  Size can also be specified with size parameter.
+	Creates an empty image the same type and size as the input image.  A single channel version is produced if ``onechannel = True``.  Size can also be specified with size parameter.
 	
 	**Parameters:**
 		* im (cvArr) - The source image.
@@ -101,6 +111,9 @@ def create(im, onechannel = False, size = 'same'):
 	
 	**Returns:**
 		An empty image.
+		
+	.. seealso::
+		:func:`clone()`
 	"""
 	try:
 		im.depth
@@ -175,8 +188,11 @@ def rotate(im, angle):
 	
 	**Returns:**
 		The rotated image.
+	
+	.. todo::
+		* Arguments to specifcy background colour and clockwise/anti-clockwise.
+		* Enclosed rectangle formula.
 	"""
-	# TODO: arguments to specifcy background colour and clockwise/anti-clockwise.
 	centre = ((im.width-1)/2, (im.height-1)/2)
 	rot = cv.CreateMat(2, 3, cv.CV_32FC1)
 	cv.GetRotationMatrix2D(centre, -angle, 1.0, rot)
@@ -195,7 +211,6 @@ def rotate(im, angle):
 	# cv.Rectangle(dst, pt1, pt2, 255)
 	return dst
 	
-# Should these functions be merged?
 def contrast(im, value):
 	"""
 	Changes the contrast of the image.
@@ -206,6 +221,12 @@ def contrast(im, value):
 	
 	**Returns:**
 		The image with changed contrast.
+	
+	.. todo::
+		Should this function be merged with :func:`brightness()`?		
+	
+	.. seealso::
+		:func:`brightness()`
 	"""
 	dst = create(im)
 	cv.ConvertScale(im, dst, value)
@@ -221,13 +242,21 @@ def brightness(im, value):
 		
 	**Returns:**
 		The image with changed brightness.
+	
+	.. todo::
+		Should this function be merged with :func:`contrast()`?
+	
+	.. seealso::
+		:func:`contrast()`
 	"""	
 	dst = create(im)
 	cv.ConvertScale(im, dst, shift = value)
 	return dst
 
 def normalise(im):
-	"""Need to write docstring"""
+	"""
+	Normalise image histogram.
+	"""
 	pass
 
 def resize(im, size):
@@ -260,7 +289,7 @@ def blackandwhite(im):
 	return dst
 
 def saltandpepper(im, level, nowarning = False):
-	"""Applies salt and pepper to the image.  If the amount of noise if above 10\% a warning is raised.  This can be turned off by setting nowarning = True.
+	"""Applies salt and pepper noise to the image.  If the amount of noise if above 10\% a warning is raised.  This can be turned off by setting ``nowarning = True``.
 	
 	**Parameters:**
 		* im (cvArr) - The source image.
@@ -269,6 +298,10 @@ def saltandpepper(im, level, nowarning = False):
 	
 	**Returns:**
 		The noisy image.
+
+	.. seealso::
+		:func:`gaussiannoise()`
+
 	"""
 	if not (0 < level <= 0.1) and nowarning == False:
 		warnings.warn("This is a lot of salt and pepper noise.  I would suggest somewhere up to 0.1.  Use 'nowarning = True' to suppress this warning.", stacklevel=2)
@@ -297,7 +330,7 @@ def saltandpepper(im, level, nowarning = False):
 		
 def gaussiannoise(im, mean = 0.0, std = 15.0):
 	"""
-	Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.  **Note:** This function takes a while to run on large images.
+	Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.
 	
 	**Parameters:**
 		* im - (cvArr) - The source image.
@@ -306,8 +339,18 @@ def gaussiannoise(im, mean = 0.0, std = 15.0):
 		
 	**Returns:**
 		The noisy image.
+		
+	.. note::
+		This function takes a while to run on large images.
+		
+	.. todo::
+		* Argument for blue amplification to model bad sensors?
+		* Use numpy to speed things up?
+	
+	.. seealso::
+		:func:`saltandpepper()`
 	"""
-	# The first version below takes around 0.4s less time to run on my computer than the version beneath it.
+	# The first version below takes around 0.4s less time to run on my computer than the version beneath it on a colour image that is about 600x800.
 	# But I still don't like it...
 	# Want to change this to make it quicker still and nicer to read.
 	# Numpy would make this really quick but don't want it be a dependancy.
@@ -368,7 +411,7 @@ def wait(key = None):
 	
 def overlay(im, overlay, pos = (0,0), blend = 1, nowarning = False):
 	"""
-	Overlays an image with a specified blend ratio.  If the overlay image is too big to fit at the specified position, it is cropped down to size and a warning is raised.  This can be turned off by setting nowarning = True.
+	Overlays an image with a specified blend ratio.  If the overlay image is too big to fit at the specified position, it is cropped down to size and a warning is raised.  This can be turned off by setting ``nowarning = True``.
 	
 	**Parameters:**
 		* im (cvArr) - The source image,
@@ -406,30 +449,45 @@ def overlay(im, overlay, pos = (0,0), blend = 1, nowarning = False):
 		
 class webcam:
 	"""
-	Need to write docstring.
+	Initialises an OpenCV capture object.
+	
+	**Parameters:**
+		* index (int) - The device ID of the camera.  If there is just one camera, this should be 0.
+	
+	**Returns:**
+		A webcam instance.
+		
+	**Raises:**
+		* NameError:  The device ID of the camera is invalid.
+	
+	.. todo::
+		* Stereo capture mode?
 	"""
 	def __init__(self, index = 0):
-		"""
-		Initialises an OpenCV capture object.
-		
-		**Parameters:**
-			* index (int) - The device ID of the camera.  If there is just one camera, this should be 0.
-		
-		**Returns:**
-			A webcam instance.
-			
-		**Raises:**
-			* NameError:  The device ID of the camera is invalid.
-		"""
 		self.cap = cv.CaptureFromCAM(index)
 		if not cv.QueryFrame(self.cap): # Not sure why I can't just check self.cap here, it seems to return a capture oject even if initialisation fails.  Weird.
 			raise NameError("Camera initialisation didn't work, maybe the wrong camera index?")
 	def show(self, flip = True):
+		"""
+		Grab an image from the webcam and show it in a :func:`cv.NamedWindow` called 'webcam'.
+		
+		**Parameters:**
+			* flip (bool) - Used to rectify the image if using a webcam which is facing you.  
+		"""
 		frame = cv.QueryFrame(self.cap)
 		if flip:
 			cv.Flip(frame, flipMode = 1)
 		show(frame, 'webcam')
 	def get(self, flip = True):
+		"""
+		Grab an image from the webcam.
+		
+		**Parameters:**
+			* flip (bool) - Used to rectify the image if using a webcam which is facing you.  
+		
+		**Returns:**
+			The webcam image.
+		"""
 		frame = cv.QueryFrame(self.cap)
 		if flip:
 			cv.Flip(frame, flipMode =1)
