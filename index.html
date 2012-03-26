@@ -52,14 +52,6 @@
 <span id="a-handy-helper-module-for-writing-opencv-programs-in-no-time"></span><h2>A handy helper module for writing OpenCV programs in no time!<a class="headerlink" href="#module-cvutils" title="Permalink to this headline">¶</a></h2>
 <p>Some handy helper functions for writing OpenCV programs in no time!</p>
 <p>The idea with this module is that most functions can be used with very few or zero additional arguments.  e.g. if you call <a class="reference internal" href="#cvutils.sample" title="cvutils.sample"><tt class="xref py py-func docutils literal"><span class="pre">sample()</span></tt></a> with just the image as an argument it takes a 16x16 pixel sample from a random point in the image.  However if you want a bit more control you can specify a rectangluar size and a coordinate, as well as tell it to place a white rectangle around the sample on the original image.  Similarly, calling <a class="reference internal" href="#cvutils.show" title="cvutils.show"><tt class="xref py py-func docutils literal"><span class="pre">show()</span></tt></a> with just the image creates a <tt class="xref py py-class docutils literal"><span class="pre">cv.NamedWindow</span></tt> with the variable name of the image and calles <tt class="xref py py-func docutils literal"><span class="pre">cv.ShowImage()</span></tt>.  Again, an optional window title can be passed if required.  I know that is pretty lazy, but it can really speed up your workflow if you are regularly just checking the outputs of CV functions.</p>
-<dl class="docutils">
-<dt><strong>TODO:</strong></dt>
-<dd><ul class="first last simple">
-<li>I could do with using Numpy for a couple of functions but I didn&#8217;t want to include external dependancies in this module.  However I think Numpy might be an OpenCV prerequisite anyway for Python, so if this is the case then why not!</li>
-<li></li>
-</ul>
-</dd>
-</dl>
 <dl class="function">
 <dt id="cvutils.blackandwhite">
 <tt class="descclassname">cvutils.</tt><tt class="descname">blackandwhite</tt><big>(</big><em>im</em><big>)</big><a class="reference internal" href="modules/cvutils.html#blackandwhite"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.blackandwhite" title="Permalink to this definition">¶</a></dt>
@@ -89,6 +81,14 @@
 <dt><strong>Returns:</strong></dt>
 <dd>The image with changed brightness.</dd>
 </dl>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Should this function be merged with <a class="reference internal" href="#cvutils.contrast" title="cvutils.contrast"><tt class="xref py py-func docutils literal"><span class="pre">contrast()</span></tt></a>?</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cvutils.contrast" title="cvutils.contrast"><tt class="xref py py-func docutils literal"><span class="pre">contrast()</span></tt></a></p>
+</div>
 </dd></dl>
 
 <dl class="function">
@@ -105,6 +105,10 @@ or a cvMat and returns the same type.</p>
 <dt><strong>Returns:</strong></dt>
 <dd>The cloned image.</dd>
 </dl>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cvutils.create" title="cvutils.create"><tt class="xref py py-func docutils literal"><span class="pre">create()</span></tt></a></p>
+</div>
 </dd></dl>
 
 <dl class="function">
@@ -121,12 +125,20 @@ or a cvMat and returns the same type.</p>
 <dt><strong>Returns:</strong></dt>
 <dd>The image with changed contrast.</dd>
 </dl>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Should this function be merged with <a class="reference internal" href="#cvutils.brightness" title="cvutils.brightness"><tt class="xref py py-func docutils literal"><span class="pre">brightness()</span></tt></a>?</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cvutils.brightness" title="cvutils.brightness"><tt class="xref py py-func docutils literal"><span class="pre">brightness()</span></tt></a></p>
+</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="cvutils.create">
 <tt class="descclassname">cvutils.</tt><tt class="descname">create</tt><big>(</big><em>im</em>, <em>onechannel=False</em>, <em>size='same'</em><big>)</big><a class="reference internal" href="modules/cvutils.html#create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an empty image the same type and size as the input image.  A single channel version is produced is onechannel = True.  Size can also be specified with size parameter.</p>
+<dd><p>Creates an empty image the same type and size as the input image.  A single channel version is produced if <tt class="docutils literal"><span class="pre">onechannel</span> <span class="pre">=</span> <span class="pre">True</span></tt>.  Size can also be specified with size parameter.</p>
 <dl class="docutils">
 <dt><strong>Parameters:</strong></dt>
 <dd><ul class="first last simple">
@@ -138,6 +150,10 @@ or a cvMat and returns the same type.</p>
 <dt><strong>Returns:</strong></dt>
 <dd>An empty image.</dd>
 </dl>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cvutils.clone" title="cvutils.clone"><tt class="xref py py-func docutils literal"><span class="pre">clone()</span></tt></a></p>
+</div>
 </dd></dl>
 
 <dl class="function">
@@ -155,12 +171,16 @@ or a cvMat and returns the same type.</p>
 <dt><strong>Returns:</strong></dt>
 <dd>The cropped image.</dd>
 </dl>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cvutils.sample" title="cvutils.sample"><tt class="xref py py-func docutils literal"><span class="pre">sample()</span></tt></a></p>
+</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="cvutils.gaussiannoise">
 <tt class="descclassname">cvutils.</tt><tt class="descname">gaussiannoise</tt><big>(</big><em>im</em>, <em>mean=0.0</em>, <em>std=15.0</em><big>)</big><a class="reference internal" href="modules/cvutils.html#gaussiannoise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.gaussiannoise" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.  <strong>Note:</strong> This function takes a while to run on large images.</p>
+<dd><p>Applies Gaussian noise to the image.  This models sensor noise found in cheap cameras in low light etc.</p>
 <dl class="docutils">
 <dt><strong>Parameters:</strong></dt>
 <dd><ul class="first last simple">
@@ -172,18 +192,33 @@ or a cvMat and returns the same type.</p>
 <dt><strong>Returns:</strong></dt>
 <dd>The noisy image.</dd>
 </dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function takes a while to run on large images.</p>
+</div>
+<div class="admonition-todo admonition" id="index-2">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>Argument for blue amplification to model bad sensors?</li>
+<li>Use numpy to speed things up?</li>
+</ul>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cvutils.saltandpepper" title="cvutils.saltandpepper"><tt class="xref py py-func docutils literal"><span class="pre">saltandpepper()</span></tt></a></p>
+</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="cvutils.normalise">
 <tt class="descclassname">cvutils.</tt><tt class="descname">normalise</tt><big>(</big><em>im</em><big>)</big><a class="reference internal" href="modules/cvutils.html#normalise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.normalise" title="Permalink to this definition">¶</a></dt>
-<dd><p>Need to write docstring</p>
+<dd><p>Normalise image histogram.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="cvutils.overlay">
 <tt class="descclassname">cvutils.</tt><tt class="descname">overlay</tt><big>(</big><em>im</em>, <em>overlay</em>, <em>pos=(0</em>, <em>0)</em>, <em>blend=1</em>, <em>nowarning=False</em><big>)</big><a class="headerlink" href="#cvutils.overlay" title="Permalink to this definition">¶</a></dt>
-<dd><p>Overlays an image with a specified blend ratio.  If the overlay image is too big to fit at the specified position, it is cropped down to size and a warning is raised.  This can be turned off by setting nowarning = True.</p>
+<dd><p>Overlays an image with a specified blend ratio.  If the overlay image is too big to fit at the specified position, it is cropped down to size and a warning is raised.  This can be turned off by setting <tt class="docutils literal"><span class="pre">nowarning</span> <span class="pre">=</span> <span class="pre">True</span></tt>.</p>
 <dl class="docutils">
 <dt><strong>Parameters:</strong></dt>
 <dd><ul class="first last simple">
@@ -205,7 +240,17 @@ or a cvMat and returns the same type.</p>
 <dl class="function">
 <dt id="cvutils.resize">
 <tt class="descclassname">cvutils.</tt><tt class="descname">resize</tt><big>(</big><em>im</em>, <em>size</em><big>)</big><a class="reference internal" href="modules/cvutils.html#resize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.resize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Need to write docstring</p>
+<dd><p>Resizes the image.</p>
+<dl class="docutils">
+<dt><strong>Parameters:</strong></dt>
+<dd><ul class="first last simple">
+<li>im (cvArr) - The source image.</li>
+<li>size (tuple) - The size of the new image.</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt>
+<dd>The resized image.</dd>
+</dl>
 </dd></dl>
 
 <dl class="function">
@@ -222,12 +267,19 @@ or a cvMat and returns the same type.</p>
 <dt><strong>Returns:</strong></dt>
 <dd>The rotated image.</dd>
 </dl>
+<div class="admonition-todo admonition" id="index-3">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>Arguments to specifcy background colour and clockwise/anti-clockwise.</li>
+<li>Enclosed rectangle formula.</li>
+</ul>
+</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="cvutils.saltandpepper">
 <tt class="descclassname">cvutils.</tt><tt class="descname">saltandpepper</tt><big>(</big><em>im</em>, <em>level</em>, <em>nowarning=False</em><big>)</big><a class="reference internal" href="modules/cvutils.html#saltandpepper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.saltandpepper" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies salt and pepper to the image.  If the amount of noise if above 10% a warning is raised.  This can be turned off by setting nowarning = True.</p>
+<dd><p>Applies salt and pepper noise to the image.  If the amount of noise if above 10% a warning is raised.  This can be turned off by setting <tt class="docutils literal"><span class="pre">nowarning</span> <span class="pre">=</span> <span class="pre">True</span></tt>.</p>
 <dl class="docutils">
 <dt><strong>Parameters:</strong></dt>
 <dd><ul class="first last simple">
@@ -239,12 +291,16 @@ or a cvMat and returns the same type.</p>
 <dt><strong>Returns:</strong></dt>
 <dd>The noisy image.</dd>
 </dl>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cvutils.gaussiannoise" title="cvutils.gaussiannoise"><tt class="xref py py-func docutils literal"><span class="pre">gaussiannoise()</span></tt></a></p>
+</div>
 </dd></dl>
 
 <dl class="function">
 <dt id="cvutils.sample">
 <tt class="descclassname">cvutils.</tt><tt class="descname">sample</tt><big>(</big><em>im</em>, <em>size=(16</em>, <em>16)</em>, <em>pos='random'</em>, <em>show_on_original=False</em>, <em>return_pos=False</em><big>)</big><a class="reference internal" href="modules/cvutils.html#sample"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cvutils.sample" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside so the full sample size is always returne.</p>
+<dd><p>Gets a rectangluar sample from an image.  If pos is too close to an edge it is moved just far enough inside so the full sample size is always returned.</p>
 <dl class="docutils">
 <dt><strong>Parameters:</strong> </dt>
 <dd><ul class="first last simple">
@@ -258,6 +314,14 @@ or a cvMat and returns the same type.</p>
 <dt><strong>Returns:</strong></dt>
 <dd>The image sample, top-left coordinate of the sample (optional).</dd>
 </dl>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Think I spotted a problem here that when the sample is really large, the position can become negative.  This maybe applies to <a class="reference internal" href="#cvutils.crop" title="cvutils.crop"><tt class="xref py py-func docutils literal"><span class="pre">crop()</span></tt></a> too.</p>
+</div>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cvutils.crop" title="cvutils.crop"><tt class="xref py py-func docutils literal"><span class="pre">crop()</span></tt></a></p>
+</div>
 </dd></dl>
 
 <dl class="function">
@@ -283,7 +347,55 @@ or a cvMat and returns the same type.</p>
 <dl class="class">
 <dt id="cvutils.webcam">
 <em class="property">class </em><tt class="descclassname">cvutils.</tt><tt class="descname">webcam</tt><big>(</big><em>index=0</em><big>)</big><a class="headerlink" href="#cvutils.webcam" title="Permalink to this definition">¶</a></dt>
-<dd><p>Need to write docstring.</p>
+<dd><p>Initialises an OpenCV capture object.</p>
+<dl class="docutils">
+<dt><strong>Parameters:</strong></dt>
+<dd><ul class="first last simple">
+<li>index (int) - The device ID of the camera.  If there is just one camera, this should be 0.</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt>
+<dd>A webcam instance.</dd>
+<dt><strong>Raises:</strong></dt>
+<dd><ul class="first last simple">
+<li>NameError:  The device ID of the camera is invalid.</li>
+</ul>
+</dd>
+</dl>
+<div class="admonition-todo admonition" id="index-4">
+<p class="first admonition-title">Todo</p>
+<ul class="last simple">
+<li>Stereo capture mode?</li>
+</ul>
+</div>
+<dl class="method">
+<dt id="cvutils.webcam.get">
+<tt class="descname">get</tt><big>(</big><em>flip=True</em><big>)</big><a class="headerlink" href="#cvutils.webcam.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grab an image from the webcam.</p>
+<dl class="docutils">
+<dt><strong>Parameters:</strong></dt>
+<dd><ul class="first last simple">
+<li>flip (bool) - Used to rectify the image if using a webcam which is facing you.</li>
+</ul>
+</dd>
+<dt><strong>Returns:</strong></dt>
+<dd>The webcam image.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="cvutils.webcam.show">
+<tt class="descname">show</tt><big>(</big><em>flip=True</em><big>)</big><a class="headerlink" href="#cvutils.webcam.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grab an image from the webcam and show it in a <tt class="xref py py-func docutils literal"><span class="pre">cv.NamedWindow()</span></tt> called &#8216;webcam&#8217;.</p>
+<dl class="docutils">
+<dt><strong>Parameters:</strong></dt>
+<dd><ul class="first last simple">
+<li>flip (bool) - Used to rectify the image if using a webcam which is facing you.</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="function">
@@ -310,6 +422,7 @@ or a cvMat and returns the same type.</p>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+<li><a class="reference internal" href="todo.html"><em>Todo List</em></a></li>
 </ul>
 </div>
 
