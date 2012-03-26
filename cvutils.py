@@ -231,8 +231,19 @@ def normalise(im):
 	pass
 
 def resize(im, size):
-	"""Need to write docstring"""
-	pass
+	"""
+	Resizes the image.
+	
+	**Parameters:**
+		* im (cvArr) - The source image.
+		* size (tuple) - The size of the new image.
+	
+	**Returns:**
+		The resized image.
+	"""
+	dst = create(im, size = size)
+	cv.Resize(im, dst)
+	return dst
 
 def blackandwhite(im):
 	"""
@@ -355,9 +366,19 @@ def wait(key = None):
 	print 'Press any key to continue...'
 	cv.WaitKey(0)
 	
-def overlay(im, overlay, pos = (0,0), blend = 1):
+def overlay(im, overlay, pos = (0,0), blend = 1, nowarning = False):
 	"""
-	Need to write docstring.
+	Overlays an image with a specified blend ratio.  If the overlay image is too big to fit at the specified position, it is cropped down to size and a warning is raised.  This can be turned off by setting nowarning = True.
+	
+	**Parameters:**
+		* im (cvArr) - The source image,
+		* overlay (cvArr) - The image to be overlayed.
+		* pos (tuple) - The position in the image to place the top-left corner of the overlay image.
+		* blend (float)/(string) - The blend ratio.  If blend is 1, the overlay image is fully opaque, if blend is 0, the overlay image is invisible.  Between 1 and 0 is transparent.  If blend = 'both', both images are added as they are, this turns any black in the overlay region to become fully transparent.
+		* nowarning (bool) - Suppress warning message.
+	
+	**Returns:**
+		* The source image with overlay image added.
 	"""
 	size = (overlay.width, overlay.height)
 	# Should I move the coordinate inside as with zoom() and sample() or crop the overlay image?  I think cropping might be the best way to go here.
@@ -370,7 +391,8 @@ def overlay(im, overlay, pos = (0,0), blend = 1):
 		warn = True
 	if warn:
 		overlay = crop(overlay, size)
-		warnings.warn("The overlay image was too big to fit at the position specified.  It has been cropped to %dx%d." %(size[0], size[1]), stacklevel=2)
+		if nowarning == False:
+			warnings.warn("The overlay image was too big to fit at the position specified.  It has been cropped to %dx%d.  Use 'nowarning = True' to suppress this warning." %(size[0], size[1]), stacklevel=2)
 
 	cv.SetImageROI(im, pos + size)
 	if blend == 'both':
